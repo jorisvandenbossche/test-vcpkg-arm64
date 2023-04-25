@@ -1,10 +1,18 @@
 FROM arm64v8/almalinux:8
 
+RUN dnf -y upgrade && dnf -y install dnf-plugins-core && dnf config-manager --set-enabled powertools
 # building openssl needs IPC-Cmd (https://github.com/microsoft/vcpkg/issues/24988)
-RUN dnf -y install curl zip unzip tar ninja-build perl-IPC-Cmd
+RUN dnf -y install gcc-toolset-12-binutils gcc-toolset-12-gcc gcc-toolset-12-gcc-c++ git python39 curl zip unzip tar ninja-build perl-IPC-Cmd
 
-# require python >= 3.7 (python 3.6 is default on base image) for meson 
-RUN ln -s /opt/python/cp38-cp38/bin/python3 /usr/bin/python3
+RUN python3 -m pip install pipx && export PIPX_BIN_DIR=/usr/local/bin && python3 -m pipx install cmake
+
+ARG DEVTOOLSET_ROOTPATH=/opt/rh/gcc-toolset-12/root
+ARG LD_LIBRARY_PATH_ARG=${DEVTOOLSET_ROOTPATH}/usr/lib64:${DEVTOOLSET_ROOTPATH}/usr/lib:${DEVTOOLSET_ROOTPATH}/usr/lib64/dyninst:${DEVTOOLSET_ROOTPATH}/usr/lib/dyninst
+ARG PREPEND_PATH=${DEVTOOLSET_ROOTPATH}/usr/bin:
+
+ENV DEVTOOLSET_ROOTPATH=${DEVTOOLSET_ROOTPATH}
+ENV LD_LIBRARY_PATH=${LD_LIBRARY_PATH_ARG}
+ENV PATH=${PREPEND_PATH}${PATH}
 
 RUN git clone https://github.com/Microsoft/vcpkg.git /opt/vcpkg
 
