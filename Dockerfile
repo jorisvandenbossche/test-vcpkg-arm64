@@ -21,7 +21,7 @@ RUN bootstrap-vcpkg.sh && \
     vcpkg integrate install && \
     vcpkg integrate bash
 
-COPY arm64-linux-dynamic-release.cmake opt/vcpkg/custom-triplets/arm64-linux-dynamic-release.cmake
+# COPY arm64-linux-dynamic-release.cmake opt/vcpkg/custom-triplets/arm64-linux-dynamic-release.cmake
 
 ENV LD_LIBRARY_PATH="${LD_LIBRARY_PATH}:/opt/vcpkg/installed/arm64-linux-dynamic-release/lib"
 RUN vcpkg install pkgconf:arm64-linux && vcpkg list
