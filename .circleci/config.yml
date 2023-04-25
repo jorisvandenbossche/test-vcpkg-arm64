@@ -1,0 +1,23 @@
+version: 2.1
+
+jobs:
+  linux-aarch64-vcpkg:
+    working_directory: ~/linux-aarch64-vcpkg
+    machine:
+      image: ubuntu-2004:2022.04.1
+      docker_layer_caching: true
+    # resource_class is what tells CircleCI to use an ARM worker for native arm builds
+    # https://circleci.com/product/features/resource-classes/
+    resource_class: arm.medium
+    environment:
+      VCPKG_INSTALL: "$VCPKG_INSTALLATION_ROOT/installed/arm64-linux-dynamic-release"
+    steps:
+      - checkout
+      - run:
+          name: Build docker image with GDAL install
+          command: docker build -t manylinux-aarch64-vcpkg-gdal:latest .
+
+workflows:
+  wheel-build:
+    jobs:
+      - linux-aarch64-vcpkg
